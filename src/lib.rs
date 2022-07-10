@@ -23,8 +23,16 @@ impl Durst {
 
 fn main() {
     let mut b = DurstBuilder::default;
-    b.add_set(MachineSet::new("t2.micro", "ami-e1aa89b", |ssh| {
+    b.add_set("server", MachineSet::new("t2.micro", "ami-e1aa89b", |ssh| {
         ssh.exec("sudo yum install vim");
     }));
-    b.run(||)
+    b.add_set("client", MachineSet::new("t2.micro", "ami-e1aa89b", |ssh|{
+        ssh.exec("sudo yum install vim");
+    }))
+    b.run(|vms: HashMap<String, MachineSetHandle>|{
+        let server_ip = vms["server"][0].ip;
+        for client in vms["client"]{
+            client.exec()
+        }
+    });
 }
